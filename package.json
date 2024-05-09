@@ -1,0 +1,8 @@
+{
+    "name": "addtime",
+    "devDependencies": {
+        "@types/bun": "latest",
+        "serve": "^14.2.3",
+        "typescript": "^5.0.0"
+    }
+}

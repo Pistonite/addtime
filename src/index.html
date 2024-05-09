@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- https://www.sitepoint.com/a-basic-html5-template/ -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Adder of Time</title>
+  <meta property="og:site_name" content="Pistonite"/>
+  <meta property="og:title" content="Adder of Time">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pistonite.github.io/addtime">
+  <meta property="og:description" content="A simple but correct time adder">
+</head>
+
+<body>
+  <h1>Adder of Time</h1>
+  <label for="help">Reference</label>
+  <p>d - days, h - hours, m - minutes, s - seconds, (no unit) - milliseconds</p>
+
+  <input type="radio" id="radio_unit_1000" name="radio_unit" value="1000" checked onchange="__addtime_update();">
+<label for="radio_unit_1000">No Alignment</label><br/>
+<input type="radio" id="radio_unit_30" name="radio_unit" value="30" onchange="__addtime_update();">
+<label for="radio_unit_30">30 FPS</label><br/>
+<input type="radio" id="radio_unit_60" name="radio_unit" value="60" onchange="__addtime_update();">
+<label for="radio_unit_60">60 FPS</label><br/>
+  <label for="input">Input:</label>
+  <br/>
+  <textarea id="input" rows="5" cols="50" placeholder="1m20s + 5m30s - 1m39s " oninput="__addtime_update();"></textarea>
+  <br/>
+  <label for="output">Output:</label>
+  <br/>
+  <textarea id="output" rows="5" cols="50" placeholder="(Output will be shown as you type in input)" readonly></textarea>
+  <br/>
+  <label for="error">Errors:</label>
+  <br/>
+  <textarea id="error" rows="5" cols="50" placeholder="(No Error :)" readonly></textarea>
+  <br/>
+  <p>
+    Source on <a href="https://github.com/Pistonite/addtime">GitHub</a>. Report bugs there too
+  </p>
+  <p>
+    You can use this app with Google Sheet! Check out the GitHub link above for more info.
+  </p>
+  <script src="main.js"></script>
+</body>
+</html>

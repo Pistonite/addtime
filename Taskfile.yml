@@ -1,0 +1,45 @@
+version: '3'
+
+tasks:
+  test:
+    desc: Run tests
+    cmds:
+    - bun test
+
+  dev:
+    desc: Run tests in watch mode
+    cmds:
+    - bun test --watch
+
+  check:
+    desc: Check for issues
+    cmds:
+    - bunx --bun tsc
+    - dprint check
+
+  fix:
+    desc: Fix issues
+    cmds:
+    - dprint fmt
+
+  build:
+    desc: Build the distributable web app
+    cmds:
+    - mkdir -p dist temp
+    - rm -rf dist/*
+    - cp src/index.html dist/index.html
+    - bun build ./src/main.ts --outfile=dist/main.js --minify
+    - bun build ./src/code.ts --outfile=temp/code.gs --minify
+    - sed -i -e '1s/^/var calc=(function(){ /' temp/code.gs
+    - sed -i -e 's/;window\.__calc=/;return /' temp/code.gs
+    - cp src/code.gs dist/appscript.txt
+    - cat temp/code.gs >> dist/appscript.txt
+    - echo '})()' >> dist/appscript.txt
+    - echo '//! https://github.com/Pistonite/addtime' > dist/time.ts
+    - echo '' >> dist/time.ts
+    - cat src/time.ts >> dist/time.ts
+
+  serve:
+    desc: Serve /dist
+    cmds:
+    - bunx --bun serve dist
