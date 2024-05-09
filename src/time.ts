@@ -156,7 +156,6 @@ export function parse(tokens: string[]): Parsed {
     const computations: (MsExpression | "ERROR!")[] = [];
     const errors: string[] = [];
 
-
     let expectLookAhead: LookAhead = LookAhead.Number;
 
     // current expression being parsed
