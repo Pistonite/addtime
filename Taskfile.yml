@@ -1,6 +1,15 @@
 version: '3'
 
 tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+    - bun install
+
+  ci:
+    cmds:
+    - bun install --frozen-lockfile
+
   test:
     desc: Run tests
     cmds:
@@ -15,12 +24,21 @@ tasks:
     desc: Check for issues
     cmds:
     - bunx --bun tsc
-    - dprint check
+    - task: prettier
+      vars:
+        PRETTIER_ARGS: --check
 
   fix:
     desc: Fix issues
     cmds:
-    - dprint fmt
+    - task: prettier
+      vars:
+        PRETTIER_ARGS: --write
+
+
+  prettier:
+    cmds:
+    - bunx --bun prettier "./**/*.{html,ts,tsx,json,js,jsx,cjs,css}" {{.PRETTIER_ARGS}}
 
   build:
     desc: Build the distributable web app
