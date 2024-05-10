@@ -53,7 +53,9 @@ tasks:
     - cp src/code.gs dist/appscript.txt
     - cat temp/code.gs >> dist/appscript.txt
     - echo '})()' >> dist/appscript.txt
-    - echo '//! https://github.com/Pistonite/addtime' > dist/time.ts
+    - echo '/* eslint-disable */' > dist/time.ts
+    - echo '// @ts-nocheck' >> dist/time.ts
+    - echo '//! https://github.com/Pistonite/addtime' >> dist/time.ts
     - echo '' >> dist/time.ts
     - cat src/time.ts >> dist/time.ts
 
