@@ -34,8 +34,7 @@ export function makeQuantum<TQps extends QuantumPerSecond>(
 }
 
 export function makeMs(val: bigint): MillisecondValue {
-    // @ts-ignore bruh
-    return { val, qps: BigInt(1000) };
+    return { val, qps: BigInt(1000) as 1000n };
 }
 
 export function toMilliseconds<TQps extends QuantumPerSecond>(
@@ -46,7 +45,8 @@ export function toMilliseconds<TQps extends QuantumPerSecond>(
     // using tenth as basis (5 is 0.5)
     const rounding = input.val < 0 ? -BigInt(5) : BigInt(5);
 
-    const newValue = ((input.val * BigInt(10) * ms) / unit + rounding) / BigInt(10);
+    const newValue =
+        ((input.val * BigInt(10) * ms) / unit + rounding) / BigInt(10);
     return makeMs(newValue);
 }
 
@@ -55,7 +55,7 @@ export function toQuantum<TQps extends QuantumPerSecond>(
     qps: TQps,
 ): TimeValue<TQps> {
     const ms = msValue.val;
-    let lo = ms * qps / BigInt(1000);
+    let lo = (ms * qps) / BigInt(1000);
     let loms = toMilliseconds({ val: lo, qps }).val;
     let hims: bigint;
     let hi: bigint;
@@ -103,7 +103,7 @@ export function calc(input: string, unit: QuantumPerSecond): CalcOutput {
         return { answers: [], errors: [] };
     }
     const { exprs, errors } = parse(tokenize(input));
-    const answers = compute(exprs, unit).map(v => {
+    const answers = compute(exprs, unit).map((v) => {
         if (v === ERROR) {
             return ERROR;
         }
@@ -131,17 +131,17 @@ export function tokenize(input: string): string[] {
     if (str !== "") {
         tokens.push(str);
     }
-    return tokens.map(t => t.replaceAll(/\s/g, "")).filter(Boolean);
+    return tokens.map((t) => t.replaceAll(/\s/g, "")).filter(Boolean);
 }
 const SECOND = BigInt(1000);
 const MINUTE = BigInt(60) * SECOND;
 const HOUR = BigInt(60) * MINUTE;
 const DAY = BigInt(24) * HOUR;
 const UNIT_MAP = {
-    "D": DAY,
-    "H": HOUR,
-    "M": MINUTE,
-    "S": SECOND,
+    D: DAY,
+    H: HOUR,
+    M: MINUTE,
+    S: SECOND,
 } as const;
 
 const LookAhead = {
@@ -149,7 +149,7 @@ const LookAhead = {
     DelimiterOrUnit: 1,
     DelimiterOrNumber: 2,
 } as const;
-type LookAhead = typeof LookAhead[keyof typeof LookAhead];
+type LookAhead = (typeof LookAhead)[keyof typeof LookAhead];
 
 /// Parse the tokens into expressions
 export function parse(tokens: string[]): Parsed {
@@ -190,7 +190,11 @@ export function parse(tokens: string[]): Parsed {
 
         if (t === "," || t === "+" || t === "-") {
             if (expectLookAhead === LookAhead.Number) {
-                errors.push("Unexpected \"" + t + "\", did you forget to put a time before?");
+                errors.push(
+                    'Unexpected "' +
+                        t +
+                        '", did you forget to put a time before?',
+                );
                 computations.push(ERROR);
                 panic = true;
             } else {
@@ -226,9 +230,16 @@ export function parse(tokens: string[]): Parsed {
                 }
                 expectLookAhead = LookAhead.Number;
             }
-        } else if (tupper === "D" || tupper === "H" || tupper === "M" || tupper === "S") {
+        } else if (
+            tupper === "D" ||
+            tupper === "H" ||
+            tupper === "M" ||
+            tupper === "S"
+        ) {
             if (expectLookAhead !== LookAhead.DelimiterOrUnit) {
-                errors.push("Unexpected \"" + t + "\". Expecting a unit or delimiter");
+                errors.push(
+                    'Unexpected "' + t + '". Expecting a unit or delimiter',
+                );
                 computations.push(ERROR);
                 panic = true;
             } else {
@@ -241,13 +252,13 @@ export function parse(tokens: string[]): Parsed {
             }
         } else {
             if (expectLookAhead === LookAhead.DelimiterOrUnit) {
-                errors.push("Unexpected \"" + t + "\". Expecting a number");
+                errors.push('Unexpected "' + t + '". Expecting a number');
                 computations.push(ERROR);
                 panic = true;
             } else {
                 var regex = /^[0-9]+$/;
                 if (!regex.test(t)) {
-                    errors.push("\"" + t + "\" is not a valid time value");
+                    errors.push('"' + t + '" is not a valid time value');
                     computations.push("ERROR!");
                     panic = true;
                 } else {
@@ -357,7 +368,7 @@ function compute<TQps extends QuantumPerSecond>(
     exprs: (MsExpression | ERROR)[],
     qps: TQps,
 ): (TimeValue<TQps> | ERROR)[] {
-    return exprs.map(function(input) {
+    return exprs.map(function (input) {
         if (input === ERROR) {
             return input;
         }

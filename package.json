@@ -2,6 +2,7 @@
     "name": "addtime",
     "devDependencies": {
         "@types/bun": "latest",
+        "prettier": "^3.2.5",
         "serve": "^14.2.3",
         "typescript": "^5.0.0"
     }
