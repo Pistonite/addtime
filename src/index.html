@@ -9,11 +9,16 @@
         <meta property="og:site_name" content="Pistonite" />
         <meta property="og:title" content="Adder of Time" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://pistonite.github.io/addtime" />
+        <meta property="og:url" content="https://addtime.pistonite.dev" />
         <meta
             property="og:description"
             content="A simple but correct time adder"
         />
+        <style>
+            :root {
+                color-scheme: light dark;
+            }
+        </style>
     </head>
 
     <body>
@@ -58,6 +63,15 @@
             placeholder="1m20s + 5m30s - 1m39s "
             oninput="__addtime_update();"
         ></textarea>
+        <br />
+        <input
+            type="checkbox"
+            id="ratio_mode_checkbox"
+            onchange="__addtime_update();"
+        />
+        <label for="ratio_mode_checkbox"
+            >Ratio Mode: Output will be Line 1 divided by Line 2 of Input</label
+        >
         <br />
         <label for="output">Output:</label>
         <br />

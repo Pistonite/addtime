@@ -112,8 +112,48 @@ export function calc(input: string, unit: QuantumPerSecond): CalcOutput {
     return { answers, errors };
 }
 
+/// Compute a divided by b (a / b). a and b should be time expressions
+export function ratio(
+    a: string,
+    b: string,
+    unit: QuantumPerSecond,
+): number | string {
+    const { exprs: aExprs, errors: aErrors } = parse(tokenize(a));
+    if (aErrors.length !== 0) {
+        return aErrors.join(", ");
+    }
+    const aVal = compute(aExprs, unit);
+    if (aVal.length < 1 || aVal[0] === ERROR) {
+        return 0;
+    }
+    const { exprs: bExprs, errors: bErrors } = parse(tokenize(b));
+    if (bErrors.length !== 0) {
+        return bErrors.join(", ");
+    }
+    const bVal = compute(bExprs, unit);
+    if (bVal.length < 1 || bVal[0] === ERROR) {
+        return 0;
+    }
+
+    const aMs = toMilliseconds(aVal[0]).val;
+    const bMs = toMilliseconds(bVal[0]).val;
+
+    if (aMs === BigInt(0)) {
+        return 0;
+    }
+
+    if (bMs === BigInt(0)) {
+        return "Cannot divide by zero";
+    }
+
+    return Number(aMs) / Number(bMs);
+}
+
 /// Tokenize the input string
 export function tokenize(input: string): string[] {
+    if (input.startsWith("-") || input.startsWith("+")) {
+        input = "0" + input;
+    }
     const tokens = [];
     let str = input;
     const regex = /[\+\-,DdHhMmSs]/;
@@ -131,7 +171,7 @@ export function tokenize(input: string): string[] {
     if (str !== "") {
         tokens.push(str);
     }
-    return tokens.map((t) => t.replaceAll(/\s/g, "")).filter(Boolean);
+    return tokens.map((t) => t.replace(/\s/g, "")).filter(Boolean);
 }
 const SECOND = BigInt(1000);
 const MINUTE = BigInt(60) * SECOND;
@@ -256,7 +296,7 @@ export function parse(tokens: string[]): Parsed {
                 computations.push(ERROR);
                 panic = true;
             } else {
-                var regex = /^[0-9]+$/;
+                const regex = /^[0-9]+$/;
                 if (!regex.test(t)) {
                     errors.push('"' + t + '" is not a valid time value');
                     computations.push("ERROR!");
