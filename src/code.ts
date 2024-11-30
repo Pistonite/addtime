@@ -1,4 +1,4 @@
-import { calc } from "./time.ts";
+import { calc, ratio } from "./time.ts";
 
 // @ts-ignore
-window.__calc = calc;
+window.__export = { calc, ratio };

@@ -4,21 +4,22 @@ tasks:
   install:
     desc: Install dependencies
     cmds:
-    - bun install
+      - bun install
 
   ci:
     cmds:
-    - bun install --frozen-lockfile
+      - bun install --frozen-lockfile
 
   test:
     desc: Run tests
     cmds:
-    - bun test
+      - bun test
+      - task: test:code
 
   dev:
     desc: Run tests in watch mode
     cmds:
-    - bun test --watch
+      - bun test --watch
 
   check:
     desc: Check for issues
@@ -38,28 +39,53 @@ tasks:
 
   prettier:
     cmds:
-    - bunx --bun prettier "./**/*.{html,ts,tsx,json,js,jsx,cjs,css}" {{.PRETTIER_ARGS}}
+      - bunx --bun prettier "./**/*.{html,ts,tsx,json,js,jsx,cjs,css}" {{.PRETTIER_ARGS}}
 
   build:
-    desc: Build the distributable web app
+    desc: Build the distributables
     cmds:
-    - mkdir -p dist temp
-    - rm -rf dist/*
-    - cp src/index.html dist/index.html
-    - bun build ./src/main.ts --outfile=dist/main.js --minify
-    - bun build ./src/code.ts --outfile=temp/code.gs --minify
-    - sed -i -e '1s/^/var calc=(function(){ /' temp/code.gs
-    - sed -i -e 's/;window\.__calc=/;return /' temp/code.gs
-    - cp src/code.gs dist/appscript.txt
-    - cat temp/code.gs >> dist/appscript.txt
-    - echo '})()' >> dist/appscript.txt
-    - echo '/* eslint-disable */' > dist/time.ts
-    - echo '// @ts-nocheck' >> dist/time.ts
-    - echo '//! https://github.com/Pistonite/addtime' >> dist/time.ts
-    - echo '' >> dist/time.ts
-    - cat src/time.ts >> dist/time.ts
+      - rm -rf dist/*
+      - task: build:main
+      - task: build:dist
+      - task: build:code
+
+  build:main:
+    desc: Build the main web app
+    cmds:
+      - mkdir -p dist
+      - cp src/index.html dist/index.html
+      - bun build ./src/main.ts --outfile=dist/main.js --minify
+
+  build:dist:
+    desc: Build the distributable TS source
+    cmds:
+      - mkdir -p dist
+      - echo '/* eslint-disable */' > dist/dist.ts
+      - echo '// @ts-nocheck' >> dist/dist.ts
+      - echo '//! https://github.com/Pistonite/addtime' >> dist/dist.ts
+      - echo '' >> dist/dist.ts
+      - cat src/time.ts >> dist/dist.ts
+
+  build:code:
+    desc: Build the distributable Google Apps Script
+    cmds:
+      - mkdir -p dist temp
+      - bun build ./src/code.ts --outfile=temp/code.ts --minify
+      - sed -i -e '1s/^/var AdderOfTime=(function(){ /' temp/code.ts
+      - sed -i -e 's/window\.__export=/;return /' temp/code.ts
+      - cp src/code.gs dist/appscript.txt
+      - cat temp/code.ts >> dist/appscript.txt
+      - echo '})()' >> dist/appscript.txt
+
+  test:code:
+    desc: Test the Google Apps Script
+    cmds:
+      - task: build:code
+      - cp dist/appscript.txt temp/appscript.e2e.js
+      - cat src/code.e2e.js >> temp/appscript.e2e.js
+      - bun temp/appscript.e2e.js
 
   serve:
     desc: Serve /dist
     cmds:
-    - bunx --bun serve dist
+      - bunx --bun serve dist

@@ -63,4 +63,13 @@ describe("tokenize", () => {
             "f",
         ]);
     });
+    test("operator first", () => {
+        expect(tokenize("-30h-")).toEqual([
+            "0", // extra operand added by tokenizer
+            "-",
+            "30",
+            "h",
+            "-",
+        ]);
+    });
 });
